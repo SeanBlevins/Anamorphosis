@@ -15,7 +15,6 @@ public class ShapeProjector : MonoBehaviour {
     {
         if (Input.GetMouseButtonDown(0))
         {
-            create_keypoint();
             project_plane();
         }
 
@@ -30,6 +29,7 @@ public class ShapeProjector : MonoBehaviour {
         }
     }
 
+    //Create keypoint object to be used later to check if plaer is standing in correct positoin for perspective effect
     private void create_keypoint()
     {
         Vector3 pos = transform.position;
@@ -37,6 +37,7 @@ public class ShapeProjector : MonoBehaviour {
         Instantiate(keyPoint, pos, rot);
     }
 
+    //Move shape plane away or towards player
     private void move_plane()
     {
         float zPos = planeObj.transform.localPosition.z + Input.GetAxis("Mouse ScrollWheel");
@@ -49,6 +50,7 @@ public class ShapeProjector : MonoBehaviour {
         planeObj.transform.localPosition = newPlanePos; 
     }
 
+    //Loop throuhg each pixel in the shape plane and raycast through it if pixel is not transparent
     private void project_plane()
     {
         MeshRenderer rend = planeObj.transform.GetComponent<MeshRenderer>();
@@ -73,6 +75,7 @@ public class ShapeProjector : MonoBehaviour {
             }
         }
 
+        //For any splashable material hit by a raycast create a new texture
         for (int i = 0; i < textures.Count; i++)
         {
             Texture2D tex = textures[i] as Texture2D;
@@ -88,6 +91,7 @@ public class ShapeProjector : MonoBehaviour {
 
     private void raycast_through_shape(float xu_pos, float yv_pos, Color pix_color)
     {
+        //determine raycast direction using the shape plane game object
         Vector3 point_loc_pos = planeObj.transform.localPosition;
         point_loc_pos.x += xu_pos;
         point_loc_pos.y += yv_pos;
@@ -103,8 +107,10 @@ public class ShapeProjector : MonoBehaviour {
         MeshRenderer rend = hit.transform.GetComponent<MeshRenderer>();       
         if (rend == null) return;
 
+        //If the object hit by the raycast does not have the splashable scirpt attached return
         if (!hit.transform.GetComponent<splashable>()) return;
 
+        //Create a list of textures to create and save in the Assets folder
         Texture2D out_tex = null;
         if (!hit.transform.GetComponent<splashable>().writtenTo)
         {
@@ -112,8 +118,10 @@ public class ShapeProjector : MonoBehaviour {
             rend.material.mainTexture = out_tex;
             textures.Add(out_tex);
             hit.transform.GetComponent<splashable>().writtenTo = true;
+            create_keypoint();
         }
 
+        //Set the pixel on the texture where the raycast hit
         Vector2 pixelUV = new Vector2();
 
         Texture2D tex = rend.material.mainTexture as Texture2D;
