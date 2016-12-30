@@ -10,6 +10,25 @@ public class ShapeProjector : MonoBehaviour {
     public GameObject planeObj;
     public GameObject keyPoint;
     private ArrayList textures = new ArrayList();
+    private InkscapeWrapper inkscapeWrapper;
+
+    void Start()
+    {
+        inkscapeWrapper = gameObject.GetComponent<InkscapeWrapper>();
+
+
+        if(inkscapeWrapper.svgToPng("test.svg", "test.png", 512, 512))
+        {
+            //success
+            System.Console.WriteLine("success");
+        }
+        else
+        {
+            //error
+            System.Console.WriteLine("error");
+        }
+        
+    }
 
     void Update()
     {
@@ -29,7 +48,7 @@ public class ShapeProjector : MonoBehaviour {
         }
     }
 
-    //Create keypoint object to be used later to check if plaer is standing in correct positoin for perspective effect
+    //Create keypoint object to be used later to check if player is standing in correct positoin for perspective effect
     private void create_keypoint()
     {
         Vector3 pos = transform.position;
@@ -70,7 +89,7 @@ public class ShapeProjector : MonoBehaviour {
                     double yv = (double)y / shapeTex.height;
                     float xu_pos = (float)(xu * 2) - 1;
                     float yv_pos = (1 - (float)(yv * 2)) * -1;
-                    raycast_through_shape(xu_pos, yv_pos, pixel);
+                    raycast_through_pixel(xu_pos, yv_pos, pixel);
                 }
             }
         }
@@ -89,7 +108,7 @@ public class ShapeProjector : MonoBehaviour {
         }
     }
 
-    private void raycast_through_shape(float xu_pos, float yv_pos, Color pix_color)
+    private void raycast_through_pixel(float xu_pos, float yv_pos, Color pix_color)
     {
         //determine raycast direction using the shape plane game object
         Vector3 point_loc_pos = planeObj.transform.localPosition;

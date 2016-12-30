@@ -66,3 +66,5 @@ $RECYCLE.BIN/
 UnityVS/
 UnityVS.meta
 Assets/Scenes/Tutorial.unity
+.vs/Anamorphosis/v14/.suo
+*.meta
