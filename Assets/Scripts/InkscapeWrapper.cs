@@ -6,6 +6,8 @@ using UnityEditor;
 
 public class InkscapeWrapper : MonoBehaviour {
 
+    //http://answers.unity3d.com/questions/382545/changing-texture-import-settings-during-runtime.html
+
     //commandline 
     //inkscape test.svg -e output.png -w5000 -h5000
 
@@ -15,18 +17,36 @@ public class InkscapeWrapper : MonoBehaviour {
     private string outputPath;
     private bool setUp = true;
 
-    public bool svgToPng(string svgFile, string pngFile, int width, int height)
+    public bool svgToPng(string svgFile, int size)
     {
+        if (!File.Exists(inkscapeExe + ".exe")) setUp = false;
+
+        svgPath = Application.dataPath + "/svg/";
+
+        if (!Directory.Exists(svgPath))
+        {
+            System.Console.WriteLine("svg path does not exist");
+            Directory.CreateDirectory(svgPath);
+        }
+
+        outputPath = svgPath + "output/";
+
+        if (!File.Exists(outputPath))
+        {
+            System.Console.WriteLine("png output path does not exist");
+            Directory.CreateDirectory(outputPath);
+        }
+
         if (!setUp) return false;
 
-        if (width > 10000 || height > 10000) return false;
+        if (size > 10000) return false;
 
-        string svgFullPath = svgPath + svgFile;
-        string pngFullPath = outputPath + pngFile;
+        string svgFullPath = svgPath + svgFile + ".svg";
+        string pngFullPath = outputPath + svgFile + "_" + size + ".png";
 
         if (!File.Exists(svgFullPath)) return false;
 
-        string inkscapeArgs = string.Format(@"""{0}"" -e ""{1}"" -w {2} -h {3}", svgFullPath, pngFullPath, width, height);
+        string inkscapeArgs = string.Format(@"""{0}"" -e ""{1}"" -w {2} -h {3}", svgFullPath, pngFullPath, size, size);
 
         System.Console.WriteLine("About to run inkscape with args : " + inkscapeArgs);
 
@@ -63,23 +83,7 @@ public class InkscapeWrapper : MonoBehaviour {
     // Use this for initialization
     void Start () {
 
-        if (!File.Exists(inkscapeExe + ".exe")) setUp = false;
-
-        svgPath = Application.dataPath + "/svg/";
-
-        if (!Directory.Exists(svgPath))
-        {
-            System.Console.WriteLine("svg path does not exist");
-            Directory.CreateDirectory(svgPath);
-        }
-
-        outputPath = svgPath + "output/";
-
-        if (!File.Exists(outputPath))
-        {
-            System.Console.WriteLine("png output path does not exist");
-            Directory.CreateDirectory(outputPath);
-        }
+        
 
     }
 

@@ -17,7 +17,7 @@ public class ShapeProjector : MonoBehaviour {
         inkscapeWrapper = gameObject.GetComponent<InkscapeWrapper>();
 
 
-        if(inkscapeWrapper.svgToPng("test.svg", "test.png", 512, 512))
+        if(inkscapeWrapper.svgToPng("test", 512))
         {
             //success
             System.Console.WriteLine("success");
