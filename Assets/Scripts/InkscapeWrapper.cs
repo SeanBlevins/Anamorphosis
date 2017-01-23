@@ -30,8 +30,9 @@ public class InkscapeWrapper : MonoBehaviour {
         }
 
         outputPath = svgPath + "output/";
+        outputPath = Application.dataPath + "/Resources/output/";
 
-        if (!File.Exists(outputPath))
+        if (!Directory.Exists(outputPath))
         {
             System.Console.WriteLine("png output path does not exist");
             Directory.CreateDirectory(outputPath);
@@ -45,6 +46,8 @@ public class InkscapeWrapper : MonoBehaviour {
         string pngFullPath = outputPath + svgFile + "_" + size + ".png";
 
         if (!File.Exists(svgFullPath)) return false;
+
+        if (File.Exists(pngFullPath)) return false;
 
         string inkscapeArgs = string.Format(@"""{0}"" -e ""{1}"" -w {2} -h {3}", svgFullPath, pngFullPath, size, size);
 
@@ -75,6 +78,17 @@ public class InkscapeWrapper : MonoBehaviour {
         {
             System.Console.WriteLine("Conversion complete, created PNG file : " + pngFullPath);
             AssetDatabase.Refresh();
+
+            //create .mat asset
+            Material material = new Material(Shader.Find("Sprites/Default"));
+            Texture2D texture = Resources.Load("output/" + svgFile + "_" + size) as Texture2D;
+            material.mainTexture = texture;
+            ShaderUtils.ChangeRenderMode(material, ShaderUtils.BlendMode.Transparent);
+
+            AssetDatabase.CreateAsset(material, "Assets/Resources/Shapes/" + svgFile + "_" + size + ".mat");
+
+            AssetDatabase.Refresh();
+
             return true;
         }
 

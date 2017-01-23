@@ -69,3 +69,6 @@ Assets/Scenes/Tutorial.unity
 .vs/Anamorphosis/v14/.suo
 *.meta
 *.png
+*.mat
+*.mat
+Assets/Resources/Shapes/star_512.mat.meta

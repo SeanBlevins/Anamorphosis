@@ -10,7 +10,7 @@ public class TexturePostProcessor : AssetPostprocessor {
         {
             TextureImporter importer = assetImporter as TextureImporter;
             importer.textureType = TextureImporterType.Advanced;
-            //importer.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+            importer.textureFormat = TextureImporterFormat.ARGB32;
             importer.isReadable = true;
             importer.filterMode = FilterMode.Point;
             importer.alphaIsTransparency = true;

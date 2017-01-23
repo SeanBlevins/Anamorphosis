@@ -27,7 +27,29 @@ public class ShapeProjector : MonoBehaviour {
             //error
             System.Console.WriteLine("error");
         }
-        
+
+        if (inkscapeWrapper.svgToPng("star", 512))
+        {
+            //success
+            System.Console.WriteLine("success");
+        }
+        else
+        {
+            //error
+            System.Console.WriteLine("error");
+        }
+
+        if (inkscapeWrapper.svgToPng("boo", 2048))
+        {
+            //success
+            System.Console.WriteLine("success");
+        }
+        else
+        {
+            //error
+            System.Console.WriteLine("error");
+        }
+
     }
 
     void Update()
@@ -40,6 +62,11 @@ public class ShapeProjector : MonoBehaviour {
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
             move_plane();
+        }
+
+        if (Input.GetButtonDown("MoveShape"))
+        {
+            move_plane_button();
         }
 
         if (Input.GetButtonDown("ToggleShape"))
@@ -67,6 +94,49 @@ public class ShapeProjector : MonoBehaviour {
         Vector3 newPlanePos = new Vector3(planeObj.transform.localPosition.x, planeObj.transform.localPosition.y, zPos);
 
         planeObj.transform.localPosition = newPlanePos; 
+    }
+
+    //Move shape plane away or towards player
+    private void move_plane_button()
+    {
+        float zPos = planeObj.transform.localPosition.z + Input.GetAxis("MoveShape");
+
+        if (zPos < 0.8) zPos = 0.86f;
+        if (zPos > 4) zPos = 4f;
+
+        Vector3 newPlanePos = new Vector3(planeObj.transform.localPosition.x, planeObj.transform.localPosition.y, zPos);
+
+        planeObj.transform.localPosition = newPlanePos;
+
+        float depth = planeObj.transform.lossyScale.z;
+        float width = planeObj.transform.lossyScale.x;
+        float height = planeObj.transform.lossyScale.y;
+
+        //print("depth  : " + depth);
+        //print("width  : " + width);
+        //print("height : " + height);
+
+        Bounds bounds = planeObj.GetComponent<Renderer>().bounds;
+
+        // Get mesh origin and farthest extent (this works best with simple convex meshes)
+        Vector3 origin = cam.WorldToScreenPoint(new Vector3(bounds.min.x, bounds.max.y, 0f));
+        Vector3 extent = cam.WorldToScreenPoint(new Vector3(bounds.max.x, bounds.min.y, 0f));
+        print("origin  : " + origin);
+        print("extent  : " + extent);
+
+        Vector3 lowerLeftPoint = cam.WorldToScreenPoint(new Vector3(planeObj.transform.position.x - width / 2, planeObj.transform.position.y - height / 2, planeObj.transform.position.z - depth / 2));
+        Vector3 upperRightPoint = cam.WorldToScreenPoint(new Vector3(planeObj.transform.position.x + width / 2, planeObj.transform.position.y + height / 2, planeObj.transform.position.z - depth / 2));
+        Vector3 upperLeftPoint = cam.WorldToScreenPoint(new Vector3(planeObj.transform.position.x - width / 2, planeObj.transform.position.y + height / 2, planeObj.transform.position.z - depth / 2));
+        Vector3 lowerRightPoint = cam.WorldToScreenPoint(new Vector3(planeObj.transform.position.x + width / 2, planeObj.transform.position.y - height / 2, planeObj.transform.position.z - depth / 2));
+
+        float xPixelDistance = Mathf.Abs(lowerLeftPoint.x - upperRightPoint.x);
+        float yPixelDistance = Mathf.Abs(lowerLeftPoint.y - upperRightPoint.y);
+
+        //print("This is the X pixel distance: " + xPixelDistance + " This is the Y pixel distance: " + yPixelDistance);
+        //print("This is the lower left pixel point: " + lowerLeftPoint);
+        //print(" This is the upper left point: " + upperLeftPoint);
+        //print("This is the lower right pixel point: " + lowerRightPoint);
+        //print(" This is the upper right pixel point: " + upperRightPoint);
     }
 
     //Loop throuhg each pixel in the shape plane and raycast through it if pixel is not transparent
@@ -133,7 +203,7 @@ public class ShapeProjector : MonoBehaviour {
         Texture2D out_tex = null;
         if (!hit.transform.GetComponent<splashable>().writtenTo)
         {
-            out_tex = new Texture2D(512, 512, TextureFormat.ARGB32, false);
+            out_tex = new Texture2D(4096, 4096, TextureFormat.ARGB32, false);
             rend.material.mainTexture = out_tex;
             textures.Add(out_tex);
             hit.transform.GetComponent<splashable>().writtenTo = true;
